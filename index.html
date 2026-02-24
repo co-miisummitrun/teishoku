@@ -1,0 +1,588 @@
+/**
+ * 大和食堂 ホームページ
+ * Design: ほっこり絵日記スタイル
+ * - きなり色ベース、柿色・藍色・若草色のアクセント
+ * - 手描き風ボーダー、マスキングテープ装飾
+ * - 写真フレーム風の画像配置
+ * - Zen Maru Gothic（見出し）、Noto Sans JP（本文）、Yuji Syuku（筆文字）
+ */
+
+import { motion } from "framer-motion";
+import { IMAGES } from "@/lib/images";
+import {
+  RiceBowlIcon,
+  OnigiriIcon,
+  SteamIcon,
+  HeartIcon,
+  LeafIcon,
+  ScatteredDecorations,
+} from "@/components/HandDrawnIcons";
+import { MapPin, Clock, Phone } from "lucide-react";
+import { MapView } from "@/components/Map";
+import { useRef } from "react";
+
+/* ─── animation variants ─── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.8 } },
+};
+const stagger = {
+  visible: { transition: { staggerChildren: 0.15 } },
+};
+
+/* ─── menu data ─── */
+const menuItems = [
+  {
+    name: "焼き魚定食",
+    desc: "脂ののった鯖を、じっくり炭火で焼きました。大根おろしでさっぱりと。",
+    price: "850",
+    image: IMAGES.yakizakana,
+    rotation: "-rotate-1",
+  },
+  {
+    name: "とんかつ定食",
+    desc: "サクサク衣の中はジューシー。おじいちゃん秘伝の揚げ方です。",
+    price: "950",
+    image: IMAGES.tonkatsu,
+    rotation: "rotate-1",
+  },
+  {
+    name: "肉じゃが定食",
+    desc: "おばあちゃんの味。ほくほくのじゃがいもに、甘辛い煮汁がしみしみ。",
+    price: "800",
+    image: IMAGES.nikujaga,
+    rotation: "-rotate-[0.5deg]",
+  },
+  {
+    name: "生姜焼き定食",
+    desc: "生姜の香りが食欲をそそる、ごはんがすすむ一品です。",
+    price: "900",
+    image: IMAGES.shogayaki,
+    rotation: "rotate-[0.8deg]",
+  },
+];
+
+export default function Home() {
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  return (
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* ═══════════ HEADER / NAV ═══════════ */}
+      <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-sm border-b border-border/50">
+        <div className="container flex items-center justify-between py-3">
+          <a href="#top" className="flex items-center gap-2 group">
+            <RiceBowlIcon className="w-7 h-7 text-kaki group-hover:scale-110 transition-transform" />
+            <span className="font-brush text-xl text-sumi-cha tracking-wider">大和食堂</span>
+          </a>
+          <nav className="hidden sm:flex items-center gap-6 text-sm font-maru font-medium text-sumi-cha/80">
+            <a href="#about" className="hover:text-kaki transition-colors">お店について</a>
+            <a href="#menu" className="hover:text-kaki transition-colors">お品書き</a>
+            <a href="#owners" className="hover:text-kaki transition-colors">店主紹介</a>
+            <a href="#access" className="hover:text-kaki transition-colors">アクセス</a>
+            <a href="tel:03-3811-2478" className="inline-flex items-center gap-1.5 text-kaki hover:text-kaki/80 transition-colors">
+              <Phone className="w-3.5 h-3.5" />
+              03-3811-2478
+            </a>
+          </nav>
+          {/* Mobile hamburger - simple version */}
+          <button
+            className="sm:hidden text-sumi-cha"
+            onClick={() => {
+              const el = document.getElementById("mobile-nav");
+              el?.classList.toggle("hidden");
+            }}
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+        {/* Mobile nav dropdown */}
+        <div id="mobile-nav" className="hidden sm:hidden bg-background border-t border-border/50 pb-3">
+          <nav className="container flex flex-col gap-3 pt-3 font-maru text-sm font-medium text-sumi-cha/80">
+            <a href="#about" className="hover:text-kaki transition-colors">お店について</a>
+            <a href="#menu" className="hover:text-kaki transition-colors">お品書き</a>
+            <a href="#owners" className="hover:text-kaki transition-colors">店主紹介</a>
+            <a href="#access" className="hover:text-kaki transition-colors">アクセス</a>
+            <a href="tel:03-3811-2478" className="inline-flex items-center gap-1.5 text-kaki hover:text-kaki/80 transition-colors">
+              <Phone className="w-3.5 h-3.5" />
+              03-3811-2478
+            </a>
+          </nav>
+        </div>
+      </header>
+
+      {/* ═══════════ HERO ═══════════ */}
+      <section id="top" className="relative py-12 md:py-20 overflow-hidden">
+        <ScatteredDecorations />
+        <div className="container relative z-10">
+          <motion.div
+            className="flex flex-col md:flex-row items-center gap-8 md:gap-14"
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+          >
+            {/* Left: Text */}
+            <motion.div className="flex-1 text-center md:text-left" variants={fadeUp}>
+              <div className="inline-flex items-center gap-1 mb-4 px-3 py-1 rounded-full bg-kaki/10 text-kaki text-xs font-maru font-medium">
+                <LeafIcon className="w-4 h-4" />
+                創業四十年
+              </div>
+              <h1 className="font-brush text-4xl sm:text-5xl lg:text-6xl text-sumi-cha leading-tight mb-4">
+                おかえりなさい。
+                <br />
+                <span className="text-kaki">今日も、</span>いつもの味。
+              </h1>
+              <p className="font-maru text-base sm:text-lg text-sumi-cha/70 max-w-md leading-relaxed">
+                おじいちゃんとおばあちゃんが、
+                <br className="hidden sm:block" />
+                心を込めてお届けする昔ながらの手作り定食。
+                <br className="hidden sm:block" />
+                ほっとする味で、お待ちしております。
+              </p>
+              <div className="mt-6 flex items-center gap-4 justify-center md:justify-start">
+                <a
+                  href="#menu"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-kaki text-white font-maru font-medium rounded-full hover:bg-kaki/90 transition-colors shadow-md"
+                >
+                  <OnigiriIcon className="w-5 h-5" />
+                  お品書きを見る
+                </a>
+              </div>
+            </motion.div>
+
+            {/* Right: Hero image */}
+            <motion.div className="flex-1 max-w-md" variants={fadeIn}>
+              <div className="relative">
+                <div className="photo-frame photo-frame-right rounded-sm">
+                  <img
+                    src={IMAGES.heroCooking}
+                    alt="おじいちゃんが魚を焼いている様子"
+                    className="w-full aspect-square object-cover rounded-sm"
+                  />
+                </div>
+                {/* Tape decoration */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rotate-[-3deg] w-20 h-6 bg-[oklch(0.88_0.06_95_/_0.7)] rounded-sm z-20" />
+                {/* Steam icon floating */}
+                <motion.div
+                  className="absolute -top-6 right-4 text-kaki/40"
+                  animate={{ y: [-4, 4, -4] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                >
+                  <SteamIcon className="w-10 h-10" />
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ NOREN DIVIDER ═══════════ */}
+      <div className="noren-divider container">
+        <span className="font-brush text-kaki text-lg">❁</span>
+      </div>
+
+      {/* ═══════════ ABOUT ═══════════ */}
+      <section id="about" className="relative py-16 md:py-24">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
+          >
+            <motion.div className="text-center mb-12" variants={fadeUp}>
+              <h2 className="font-brush text-3xl sm:text-4xl text-sumi-cha mb-3">お店について</h2>
+              <p className="font-maru text-sm text-kaki">— about us —</p>
+            </motion.div>
+
+            <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+              {/* Interior photo */}
+              <motion.div className="lg:w-1/2" variants={fadeIn}>
+                <div className="photo-frame rounded-sm max-w-lg mx-auto">
+                  <img
+                    src={IMAGES.interior}
+                    alt="大和食堂の店内"
+                    className="w-full aspect-[16/10] object-cover rounded-sm"
+                  />
+                </div>
+                <p className="text-center text-xs text-sumi-cha/40 font-maru mt-3 italic">
+                  カウンター8席、テーブル2卓のこじんまりとしたお店です
+                </p>
+              </motion.div>
+
+              {/* Text */}
+              <motion.div className="lg:w-1/2 space-y-5" variants={fadeUp}>
+                <div className="hand-drawn-border bg-card p-6 sm:p-8 relative">
+                  {/* Tape on top */}
+                  <div className="absolute -top-3 left-8 rotate-[2deg] w-16 h-5 bg-[oklch(0.82_0.10_135_/_0.5)] rounded-sm" />
+                  <p className="font-maru text-sumi-cha/80 leading-[2] text-[15px]">
+                    昭和六十年の創業以来、この小さなお店で
+                    毎日コツコツとお料理を作り続けてまいりました。
+                  </p>
+                  <p className="font-maru text-sumi-cha/80 leading-[2] text-[15px] mt-3">
+                    おじいちゃんが焼く魚、おばあちゃんが煮る肉じゃが。
+                    特別なものはありませんが、
+                    <span className="text-kaki font-medium">「毎日食べても飽きない味」</span>
+                    を大切にしています。
+                  </p>
+                  <p className="font-maru text-sumi-cha/80 leading-[2] text-[15px] mt-3">
+                    お米は地元のお百姓さんから直接仕入れ、
+                    お味噌汁のお出汁は毎朝かつおと昆布からとっています。
+                    どうぞ、おうちに帰ってきたつもりで
+                    ゆっくりしていってくださいね。
+                  </p>
+                  <div className="mt-4 flex items-center gap-1 text-kaki/60">
+                    <HeartIcon className="w-4 h-4" />
+                    <HeartIcon className="w-4 h-4" />
+                    <HeartIcon className="w-4 h-4" />
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ MENU ═══════════ */}
+      <section id="menu" className="relative py-16 md:py-24 bg-[oklch(0.95_0.02_85)]">
+        <ScatteredDecorations className="opacity-[0.04]" />
+        <div className="container relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
+          >
+            <motion.div className="text-center mb-14" variants={fadeUp}>
+              <h2 className="font-brush text-3xl sm:text-4xl text-sumi-cha mb-3">お品書き</h2>
+              <p className="font-maru text-sm text-kaki">— menu —</p>
+              <p className="font-maru text-sm text-sumi-cha/60 mt-3">
+                すべての定食に、ごはん・お味噌汁・お漬物・小鉢がつきます
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-4xl mx-auto">
+              {menuItems.map((item, i) => (
+                <motion.div
+                  key={item.name}
+                  variants={fadeUp}
+                  className="group"
+                >
+                  <div className={`bg-card rounded-sm overflow-hidden shadow-sm hover:shadow-md transition-shadow ${item.rotation}`}
+                    style={{ borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px", border: "2px solid oklch(0.85 0.04 55)" }}
+                  >
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full aspect-[16/10] object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {/* Price tag */}
+                      <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
+                        <span className="font-maru font-bold text-kaki text-lg">{item.price}</span>
+                        <span className="font-maru text-sumi-cha/60 text-xs ml-0.5">円</span>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-maru font-bold text-lg text-sumi-cha mb-1.5 flex items-center gap-2">
+                        {item.name}
+                        {i === 0 && (
+                          <span className="text-[10px] font-medium bg-kaki/15 text-kaki px-2 py-0.5 rounded-full">
+                            人気 No.1
+                          </span>
+                        )}
+                      </h3>
+                      <p className="font-maru text-sm text-sumi-cha/60 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Extra menu note */}
+            <motion.div className="mt-12 text-center" variants={fadeUp}>
+              <div className="inline-block hand-drawn-border bg-card px-6 py-4 relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rotate-[-1deg] w-16 h-5 bg-[oklch(0.88_0.06_95_/_0.7)] rounded-sm" />
+                <p className="font-maru text-sm text-sumi-cha/70">
+                  🍚 ごはん大盛り <span className="font-medium text-kaki">無料</span>　
+                  🥚 生たまご <span className="font-medium text-kaki">+50円</span>　
+                  🍵 食後のお茶 <span className="font-medium text-kaki">サービス</span>
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ NOREN DIVIDER ═══════════ */}
+      <div className="noren-divider container py-6">
+        <span className="font-brush text-kaki text-lg">❁</span>
+      </div>
+
+      {/* ═══════════ OWNERS ═══════════ */}
+      <section id="owners" className="relative py-16 md:py-24">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
+          >
+            <motion.div className="text-center mb-12" variants={fadeUp}>
+              <h2 className="font-brush text-3xl sm:text-4xl text-sumi-cha mb-3">店主紹介</h2>
+              <p className="font-maru text-sm text-kaki">— our family —</p>
+            </motion.div>
+
+            <motion.div
+              className="max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12"
+              variants={fadeUp}
+            >
+              {/* Owners photo */}
+              <div className="md:w-1/2 relative">
+                <div className="photo-frame rounded-sm">
+                  <img
+                    src={IMAGES.owners}
+                    alt="おじいちゃんとおばあちゃん"
+                    className="w-full aspect-[4/3] object-cover rounded-sm"
+                  />
+                </div>
+                {/* Tape */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rotate-[2deg] w-20 h-6 bg-[oklch(0.85_0.10_55_/_0.6)] rounded-sm z-10" />
+              </div>
+
+              {/* Text */}
+              <div className="md:w-1/2 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-ai/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="font-brush text-ai text-sm">父</span>
+                  </div>
+                  <div>
+                    <h3 className="font-maru font-bold text-sumi-cha">
+                      店主・大和 正雄
+                      <span className="text-xs text-sumi-cha/40 font-normal ml-2">（76歳）</span>
+                    </h3>
+                    <p className="font-maru text-sm text-sumi-cha/60 leading-relaxed mt-1">
+                      「うまいもんは、手間ひまかけんとできんのじゃ。」
+                      が口癖。毎朝5時に起きて仕込みを始めます。
+                      魚を焼かせたら右に出る者なし。
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-full h-px bg-border/60" />
+
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-kaki/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <span className="font-brush text-kaki text-sm">母</span>
+                  </div>
+                  <div>
+                    <h3 className="font-maru font-bold text-sumi-cha">
+                      女将・大和 ハル
+                      <span className="text-xs text-sumi-cha/40 font-normal ml-2">（74歳）</span>
+                    </h3>
+                    <p className="font-maru text-sm text-sumi-cha/60 leading-relaxed mt-1">
+                      「たくさん食べて元気出してね。」
+                      が口癖。煮物と漬物はおばあちゃんの担当。
+                      常連さんの顔と好みは全部覚えています。
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-kaki/5 rounded-lg">
+                  <p className="font-maru text-xs text-sumi-cha/50 leading-relaxed text-center italic">
+                    「二人三脚で四十年。これからも元気なうちは、<br />
+                    みなさんのお腹を満たし続けますよ。」
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ DAILY SPECIALS BANNER ═══════════ */}
+      <section className="py-10 bg-[oklch(0.45_0.06_240)] relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-2 left-[10%] rotate-12 text-white">
+            <OnigiriIcon className="w-16 h-16" />
+          </div>
+          <div className="absolute bottom-2 right-[15%] -rotate-6 text-white">
+            <RiceBowlIcon className="w-14 h-14" />
+          </div>
+        </div>
+        <div className="container relative z-10 text-center">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+          >
+            <h3 className="font-brush text-2xl sm:text-3xl text-white mb-3">本日の日替わり定食</h3>
+            <p className="font-maru text-white/80 text-sm mb-1">毎日おじいちゃんが市場で選んだ旬の食材で作ります</p>
+            <p className="font-maru text-white/60 text-xs">
+              ※ 日替わりメニューは店頭の黒板をご確認ください
+            </p>
+            <div className="mt-4 inline-block bg-white/15 backdrop-blur-sm px-5 py-2 rounded-full">
+              <span className="font-maru font-bold text-white text-xl">750</span>
+              <span className="font-maru text-white/80 text-sm ml-1">円（税込）</span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ ACCESS ═══════════ */}
+      <section id="access" className="relative py-16 md:py-24">
+        <div className="container">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
+          >
+            <motion.div className="text-center mb-12" variants={fadeUp}>
+              <h2 className="font-brush text-3xl sm:text-4xl text-sumi-cha mb-3">アクセス</h2>
+              <p className="font-maru text-sm text-kaki">— access —</p>
+            </motion.div>
+
+            <motion.div
+              className="max-w-3xl mx-auto"
+              variants={fadeUp}
+            >
+              <div className="hand-drawn-border bg-card p-6 sm:p-8 relative">
+                <div className="absolute -top-3 right-8 rotate-[-2deg] w-16 h-5 bg-[oklch(0.82_0.10_135_/_0.5)] rounded-sm" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-kaki/10 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-4 h-4 text-kaki" />
+                      </div>
+                      <div>
+                        <p className="font-maru font-medium text-sm text-sumi-cha">住所</p>
+                        <p className="font-maru text-sm text-sumi-cha/60 mt-0.5">
+                          〒113-0034<br />
+                          東京都文京区湯島3丁目6-15<br />
+                          湯島天神通り商店街の中ほど
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-kaki/10 flex items-center justify-center flex-shrink-0">
+                        <Clock className="w-4 h-4 text-kaki" />
+                      </div>
+                      <div>
+                        <p className="font-maru font-medium text-sm text-sumi-cha">営業時間</p>
+                        <p className="font-maru text-sm text-sumi-cha/60 mt-0.5">
+                          昼 11:00 〜 14:00<br />
+                          夜 17:00 〜 20:00<br />
+                          <span className="text-kaki text-xs">※ 売り切れ次第終了</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-kaki/10 flex items-center justify-center flex-shrink-0">
+                        <Phone className="w-4 h-4 text-kaki" />
+                      </div>
+                      <div>
+                        <p className="font-maru font-medium text-sm text-sumi-cha">お電話</p>
+                        <p className="font-maru text-sm text-sumi-cha/60 mt-0.5">
+                          <a href="tel:03-3811-2478" className="hover:text-kaki transition-colors">03-3811-2478</a><br />
+                          <span className="text-xs">（ご予約は承っておりません）</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <p className="font-maru font-medium text-sm text-sumi-cha mb-2">定休日</p>
+                      <p className="font-maru text-sm text-sumi-cha/60">
+                        毎週日曜日・祝日<br />
+                        <span className="text-xs">（お盆とお正月はお休みをいただきます）</span>
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="font-maru font-medium text-sm text-sumi-cha mb-2">お席</p>
+                      <p className="font-maru text-sm text-sumi-cha/60">
+                        カウンター 8席<br />
+                        テーブル 2卓（4名様×2）
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="font-maru font-medium text-sm text-sumi-cha mb-2">アクセス</p>
+                      <p className="font-maru text-sm text-sumi-cha/60">
+                        東京メトロ千代田線 湯島駅 3番出口より徒歩3分<br />
+                        JR御徒町駅 北口より徒歩8分
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Google Map */}
+              <div className="mt-8 hand-drawn-border bg-[oklch(0.93_0.02_85)] p-4 overflow-hidden">
+                <MapView
+                  className="aspect-[16/9] sm:aspect-[16/7] rounded"
+                  initialCenter={{ lat: 35.7076, lng: 139.7690 }}
+                  initialZoom={16}
+                  onMapReady={(map) => {
+                    mapRef.current = map;
+                    new google.maps.marker.AdvancedMarkerElement({
+                      map,
+                      position: { lat: 35.7076, lng: 139.7690 },
+                      title: "大和食堂",
+                    });
+                  }}
+                />
+                <p className="font-maru text-xs text-sumi-cha/40 text-center mt-2">
+                  湯島天神通り商店街の中ほど、お肉屋さんの隣にあります
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ FOOTER ═══════════ */}
+      <footer className="bg-[oklch(0.30_0.03_60)] py-10 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-4 left-[20%] rotate-12 text-white">
+            <RiceBowlIcon className="w-20 h-20" />
+          </div>
+          <div className="absolute bottom-4 right-[20%] -rotate-12 text-white">
+            <OnigiriIcon className="w-16 h-16" />
+          </div>
+        </div>
+        <div className="container relative z-10 text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <RiceBowlIcon className="w-6 h-6 text-kaki/60" />
+            <span className="font-brush text-xl text-warm-cream/80 tracking-wider">大和食堂</span>
+          </div>
+          <p className="font-maru text-sm text-warm-cream/40 mb-1">
+            創業昭和六十年 — おじいちゃんとおばあちゃんの定食屋
+          </p>
+          <p className="font-maru text-xs text-warm-cream/40 mt-2">
+            東京都文京区湯島3丁目6-15 ｜ <a href="tel:03-3811-2478" className="hover:text-warm-cream/60 transition-colors">03-3811-2478</a>
+          </p>
+          <p className="font-maru text-xs text-warm-cream/25 mt-4">
+            &copy; 2025 大和食堂 All rights reserved.
+          </p>
+          <div className="mt-4 flex items-center justify-center gap-1 text-kaki/30">
+            <HeartIcon className="w-3 h-3" />
+            <span className="font-maru text-[10px] text-warm-cream/20">まごころ込めて</span>
+            <HeartIcon className="w-3 h-3" />
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
